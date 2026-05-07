@@ -246,118 +246,119 @@ client.on("messageCreate", async (message) => {
     // ===============================
     //   كاست إيمبد للكل
     // ===============================
-    if (args[0] === "ايمبد" && args[1] !== "رتبة") {
-      args.shift();
-      const content = args.join(" ");
+    if (customId.startsWith("confirmEmbedAll_")) {
+  const data = customId.replace("confirmEmbedAll_", "");
+  const parts = data.split("_");
 
-      if (!content.includes("|"))
-        return message.reply("استخدم:\n!كاست ايمبد العنوان | الوصف");
+  const title = parts[0];
+  const desc = parts.slice(1).join("_");
 
-      const [title, desc] = content.split("|").map(t => t.trim());
+  const emb = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(desc)
+    .setColor("Gold");
 
-      const preview = new EmbedBuilder()
-        .setTitle(title)
-        .setDescription(`${desc}\n\n--------------------\n\n@everyone`)
-        .setColor("Gold");
+  const members = await guild.members.fetch();
 
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`confirmEmbedAll_${title}_${desc}`)
-          .setLabel("✔️ تأكيد")
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId("cancelCast")
-          .setLabel("❌ إلغاء")
-          .setStyle(ButtonStyle.Danger)
-      );
+  members.forEach(async (m) => {
+    if (m.user.bot) return;
 
-      return message.reply({ embeds: [preview], components: [row] });
-    }
+    try {
+      await m.send({ embeds: [emb] });
+    } catch {}
+  });
+
+  return interaction.update({
+    content: "✅ تم إرسال الإيمبد للكل بالخاص.",
+    embeds: [],
+    components: [],
+  });
+}
 
     // ===============================
     //   كاست إيمبد لرتبة
     // ===============================
-    if (args[0] === "ايمبد" && args[1] === "رتبة") {
-      args.shift();
-      args.shift();
+    if (customId.startsWith("confirmEmbedRole_")) {
+  const data = customId.replace("confirmEmbedRole_", "");
+  const parts = data.split("_");
 
-      const role = message.mentions.roles.first();
-      if (!role) return message.reply("❌ لازم تمنشن رتبة");
+  const roleId = parts[0];
+  const title = parts[1];
+  const desc = parts.slice(2).join("_");
 
-      args.shift();
-      const content = args.join(" ");
+  const emb = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(desc)
+    .setColor("Gold");
 
-      if (!content.includes("|"))
-        return message.reply("استخدم:\n!كاست ايمبد رتبة @role العنوان | الوصف");
+  const role = guild.roles.cache.get(roleId);
 
-      const [title, desc] = content.split("|").map(t => t.trim());
+  role.members.forEach(async (m) => {
+    if (m.user.bot) return;
 
-      const preview = new EmbedBuilder()
-        .setTitle(title)
-        .setDescription(`${desc}\n\n--------------------\n\n<@&${role.id}>`)
-        .setColor("Gold");
+    try {
+      await m.send({ embeds: [emb] });
+    } catch {}
+  });
 
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`confirmEmbedRole_${role.id}_${title}_${desc}`)
-          .setLabel("✔️ تأكيد")
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId("cancelCast")
-          .setLabel("❌ إلغاء")
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      return message.reply({ embeds: [preview], components: [row] });
-    }
+  return interaction.update({
+    content: "✅ تم إرسال الإيمبد للرتبة بالخاص.",
+    embeds: [],
+    components: [],
+  });
+}
 
     // ===============================
     //   كاست نصي لرتبة
     // ===============================
-    if (args[0] === "رتبة") {
-      args.shift();
-      const role = message.mentions.roles.first();
-      if (!role) return message.reply("❌ لازم تمنشن رتبة");
+    if (customId.startsWith("confirmRole_")) {
+  const roleId = customId.split("_")[1];
 
-      args.shift();
-      const text = args.join(" ");
+  const text = message.content
+    .split("--------------------")[0]
+    .replace(/📢 \*\*معاينة لرتبة <@&\d+>\*\*/, "");
 
-      const preview = `📢 **معاينة لرتبة ${role}**\n\n${text}\n\n--------------------\n\n<@&${role.id}>`;
+  const role = guild.roles.cache.get(roleId);
 
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`confirmRole_${role.id}`)
-          .setLabel("✔️ تأكيد")
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId("cancelCast")
-          .setLabel("❌ إلغاء")
-          .setStyle(ButtonStyle.Danger)
-      );
+  role.members.forEach(async (m) => {
+    if (m.user.bot) return;
 
-      return message.reply({ content: preview, components: [row] });
-    }
+    try {
+      await m.send(text);
+    } catch {}
+  });
+
+  return interaction.update({
+    content: "✅ تم إرسال الكاست للرتبة بالخاص.",
+    embeds: [],
+    components: [],
+  });
+}
 
     // ===============================
     //   كاست نصي للكل
     // ===============================
-    const text = args.join(" ");
-    const preview = `📢 **معاينة للكل**\n\n${text}\n\n--------------------\n\n@everyone`;
+   if (customId === "confirmAll") {
+  const text = message.content
+    .split("--------------------")[0]
+    .replace("📢 **معاينة للكل**", "");
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("confirmAll")
-        .setLabel("✔️ تأكيد")
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId("cancelCast")
-        .setLabel("❌ إلغاء")
-        .setStyle(ButtonStyle.Danger)
-    );
+  const members = await guild.members.fetch();
 
-    return message.reply({ content: preview, components: [row] });
-  }
-});
+  members.forEach(async (m) => {
+    if (m.user.bot) return;
+
+    try {
+      await m.send(text);
+    } catch {}
+  });
+
+  return interaction.update({
+    content: "✅ تم إرسال الكاست للكل بالخاص.",
+    embeds: [],
+    components: [],
+  });
+)
 
 // =====================================================
 // ====================== دالة اللوق =====================
