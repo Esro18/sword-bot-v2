@@ -36,7 +36,7 @@ client.on("ready", () => {
 });
 
 // =====================================================
-// =============== messageCreate (الأوامر + الفواتير + الكاست) ===
+// =============== messageCreate (الأوامر + الفواتير + الكاست)
 // =====================================================
 
 client.on("messageCreate", async (message) => {
@@ -51,51 +51,42 @@ client.on("messageCreate", async (message) => {
   // ====================== !اوامر ======================
 
   if (cmd === "اوامر") {
-  const emb = new EmbedBuilder()
-    .setColor(0x3498db)
-    .setTitle("📌 أوامر البوت")
-    .setDescription(
-      "🎙️ **!كاست @user <رسالة>**\n" +
-      "إرسال رسالة لشخص.\n\n" +
+    const emb = new EmbedBuilder()
+      .setColor(0x3498db)
+      .setTitle("📌 أوامر البوت")
+      .setDescription(
+        "🎙️ **!كاست @user <رسالة>**\n" +
+          "إرسال رسالة لشخص (بالخاص).\n\n" +
+          "🎙️ **!كاست <رسالة>**\n" +
+          "إرسال رسالة للكل (بالخاص).\n\n" +
+          "🎙️ **!كاست رتبة @role <رسالة>**\n" +
+          "إرسال رسالة لرتبة (بالخاص).\n\n" +
+          "🎙️ **!كاست ايمبد <عنوان | وصف>**\n" +
+          "إيمبد للكل (بالخاص).\n\n" +
+          "🎙️ **!كاست ايمبد رتبة @role <عنوان | وصف>**\n" +
+          "إيمبد لرتبة (بالخاص).\n\n" +
+          "🎙️ **!كاست ايمبد @user <عنوان | وصف>**\n" +
+          "إيمبد لشخص (بالخاص).\n\n" +
+          "📄 **!فاتورة**\n" +
+          "إنشاء فاتورة تفاعلية.\n\n" +
+          "✏️ **!تعديل رقم | مبلغ | سبب**\n" +
+          "تعديل فاتورة."
+      )
+      .setFooter({ text: BOT_NAME })
+      .setTimestamp();
 
-      "🎙️ **!كاست <رسالة>**\n" +
-      "إرسال رسالة للكل.\n\n" +
-
-      "🎙️ **!كاست رتبة @role <رسالة>**\n" +
-      "إرسال رسالة لرتبة.\n\n" +
-
-      "🎙️ **!كاست ايمبد <عنوان | وصف>**\n" +
-      "إيمبد للكل.\n\n" +
-
-      "🎙️ **!كاست ايمبد رتبة @role <عنوان | وصف>**\n" +
-      "إيمبد لرتبة.\n\n" +
-
-      "🎙️ **!كاست ايمبد @user <عنوان | وصف>**\n" +
-      "إيمبد لشخص.\n\n" +
-
-      "📄 **!فاتورة**\n" +
-      "إنشاء فاتورة تفاعلية.\n\n" +
-
-      "✏️ **!تعديل رقم | مبلغ | سبب**\n" +
-      "تعديل فاتورة."
-    )
-    .setFooter({ text: BOT_NAME })
-    .setTimestamp();
-
-  return message.reply({ embeds: [emb] });
-}
+    return message.reply({ embeds: [emb] });
+  }
 
   // =====================================================
   // ===================== نظام الفاتورة ==================
   // =====================================================
 
   if (cmd === "فاتورة") {
-    if (!isStaff)
-      return message.reply("❌ هذا الأمر للموظفين فقط.");
+    if (!isStaff) return message.reply("❌ هذا الأمر للموظفين فقط.");
 
     const invoiceChannel = message.guild.channels.cache.get(INVOICE_CHANNEL);
-    if (!invoiceChannel)
-      return message.reply("❌ لم يتم العثور على روم الفواتير.");
+    if (!invoiceChannel) return message.reply("❌ لم يتم العثور على روم الفواتير.");
 
     let answers = {};
 
@@ -154,7 +145,6 @@ client.on("messageCreate", async (message) => {
         .setCustomId(`invoice_paid_${invoiceId}`)
         .setLabel("تم الدفع")
         .setStyle(ButtonStyle.Success),
-
       new ButtonBuilder()
         .setCustomId(`invoice_cancel_${invoiceId}`)
         .setLabel("إلغاء الفاتورة")
@@ -178,27 +168,24 @@ client.on("messageCreate", async (message) => {
   }
 
   // =====================================================
-  // ===================== نظام الكاست البسيط =============
+  // ===================== نظام الكاست ====================
   // =====================================================
 
   if (cmd === "كاست") {
-    if (!isStaff)
-      return message.reply("❌ هذا الأمر للموظفين فقط.");
+    if (!isStaff) return message.reply("❌ هذا الأمر للموظفين فقط.");
 
-    // ===============================
-    //   كاست إيمبد لشخص
-    // ===============================
+    // ===== كاست إيمبد لشخص =====
     if (args[0] === "ايمبد" && message.mentions.users.first()) {
-      args.shift();
+      args.shift(); // شيل كلمة ايمبد
 
       const user = message.mentions.users.first();
-      args.shift();
+      args.shift(); // شيل المنشن
 
       const content = args.join(" ");
       if (!content.includes("|"))
         return message.reply("استخدم:\n!كاست ايمبد @user العنوان | الوصف");
 
-      const [title, desc] = content.split("|").map(t => t.trim());
+      const [title, desc] = content.split("|").map((t) => t.trim());
 
       const preview = new EmbedBuilder()
         .setTitle(title)
@@ -208,7 +195,7 @@ client.on("messageCreate", async (message) => {
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(`confirmEmbedUser_${user.id}_${title}_${desc}`)
-          .setLabel("✔️ تأكيد")
+          .setLabel("✔️ تأكيد الإرسال بالخاص")
           .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
           .setCustomId("cancelCast")
@@ -219,20 +206,81 @@ client.on("messageCreate", async (message) => {
       return message.reply({ embeds: [preview], components: [row] });
     }
 
-    // ===============================
-    //   كاست نصي لشخص
-    // ===============================
+    // ===== كاست إيمبد لرتبة =====
+    if (args[0] === "ايمبد" && message.mentions.roles.first()) {
+      args.shift(); // شيل كلمة ايمبد
+
+      const role = message.mentions.roles.first();
+      args.shift(); // شيل المنشن
+
+      const content = args.join(" ");
+      if (!content.includes("|"))
+        return message.reply("استخدم:\n!كاست ايمبد رتبة @role العنوان | الوصف");
+
+      const [title, desc] = content.split("|").map((t) => t.trim());
+
+      const preview = new EmbedBuilder()
+        .setTitle(title)
+        .setDescription(
+          `${desc}\n\n--------------------\n\nإرسال بالخاص لأعضاء الرتبة: <@&${role.id}>`
+        )
+        .setColor("Gold");
+
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`confirmEmbedRole_${role.id}_${title}_${desc}`)
+          .setLabel("✔️ تأكيد الإرسال بالخاص")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId("cancelCast")
+          .setLabel("❌ إلغاء")
+          .setStyle(ButtonStyle.Danger)
+      );
+
+      return message.reply({ embeds: [preview], components: [row] });
+    }
+
+    // ===== كاست إيمبد للكل =====
+    if (args[0] === "ايمبد" && !message.mentions.users.first() && !message.mentions.roles.first()) {
+      args.shift(); // شيل كلمة ايمبد
+
+      const content = args.join(" ");
+      if (!content.includes("|"))
+        return message.reply("استخدم:\n!كاست ايمبد العنوان | الوصف");
+
+      const [title, desc] = content.split("|").map((t) => t.trim());
+
+      const preview = new EmbedBuilder()
+        .setTitle(title)
+        .setDescription(`${desc}\n\n--------------------\n\nإرسال بالخاص للكل`)
+        .setColor("Gold");
+
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`confirmEmbedAll_${title}_${desc}`)
+          .setLabel("✔️ تأكيد الإرسال بالخاص")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId("cancelCast")
+          .setLabel("❌ إلغاء")
+          .setStyle(ButtonStyle.Danger)
+      );
+
+      return message.reply({ embeds: [preview], components: [row] });
+    }
+
+    // ===== كاست نصي لشخص =====
     if (message.mentions.users.first() && args[0] !== "ايمبد") {
       const user = message.mentions.users.first();
-      args.shift();
+      args.shift(); // شيل المنشن
       const text = args.join(" ");
 
-      const preview = `📢 **معاينة الكاست للشخص ${user}**\n\n${text}\n\n--------------------\n\n<@${user.id}>`;
+      const preview = `📢 **معاينة الكاست للشخص <@${user.id}>**\n\n${text}\n\n--------------------\n\nسيتم الإرسال بالخاص فقط.`;
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(`confirmUser_${user.id}`)
-          .setLabel("✔️ تأكيد")
+          .setLabel("✔️ تأكيد الإرسال بالخاص")
           .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
           .setCustomId("cancelCast")
@@ -243,122 +291,48 @@ client.on("messageCreate", async (message) => {
       return message.reply({ content: preview, components: [row] });
     }
 
-    // ===============================
-    //   كاست إيمبد للكل
-    // ===============================
-    if (customId.startsWith("confirmEmbedAll_")) {
-  const data = customId.replace("confirmEmbedAll_", "");
-  const parts = data.split("_");
+    // ===== كاست نصي لرتبة =====
+    if (message.mentions.roles.first() && args[0] !== "ايمبد") {
+      const role = message.mentions.roles.first();
+      args.shift(); // شيل المنشن
+      const text = args.join(" ");
 
-  const title = parts[0];
-  const desc = parts.slice(1).join("_");
+      const preview = `📢 **معاينة لرتبة <@&${role.id}>**\n\n${text}\n\n--------------------\n\nسيتم الإرسال بالخاص لأعضاء الرتبة فقط.`;
 
-  const emb = new EmbedBuilder()
-    .setTitle(title)
-    .setDescription(desc)
-    .setColor("Gold");
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`confirmRole_${role.id}`)
+          .setLabel("✔️ تأكيد الإرسال بالخاص")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId("cancelCast")
+          .setLabel("❌ إلغاء")
+          .setStyle(ButtonStyle.Danger)
+      );
 
-  const members = await guild.members.fetch();
+      return message.reply({ content: preview, components: [row] });
+    }
 
-  members.forEach(async (m) => {
-    if (m.user.bot) return;
+    // ===== كاست نصي للكل =====
+    const text = args.join(" ");
+    if (!text) return message.reply("اكتب رسالة الكاست.");
 
-    try {
-      await m.send({ embeds: [emb] });
-    } catch {}
-  });
+    const preview = `📢 **معاينة للكل**\n\n${text}\n\n--------------------\n\nسيتم الإرسال بالخاص لكل الأعضاء.`;
 
-  return interaction.update({
-    content: "✅ تم إرسال الإيمبد للكل بالخاص.",
-    embeds: [],
-    components: [],
-  });
-}
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("confirmAll")
+        .setLabel("✔️ تأكيد الإرسال بالخاص")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("cancelCast")
+        .setLabel("❌ إلغاء")
+        .setStyle(ButtonStyle.Danger)
+    );
 
-    // ===============================
-    //   كاست إيمبد لرتبة
-    // ===============================
-    if (customId.startsWith("confirmEmbedRole_")) {
-  const data = customId.replace("confirmEmbedRole_", "");
-  const parts = data.split("_");
-
-  const roleId = parts[0];
-  const title = parts[1];
-  const desc = parts.slice(2).join("_");
-
-  const emb = new EmbedBuilder()
-    .setTitle(title)
-    .setDescription(desc)
-    .setColor("Gold");
-
-  const role = guild.roles.cache.get(roleId);
-
-  role.members.forEach(async (m) => {
-    if (m.user.bot) return;
-
-    try {
-      await m.send({ embeds: [emb] });
-    } catch {}
-  });
-
-  return interaction.update({
-    content: "✅ تم إرسال الإيمبد للرتبة بالخاص.",
-    embeds: [],
-    components: [],
-  });
-}
-
-    // ===============================
-    //   كاست نصي لرتبة
-    // ===============================
-    if (customId.startsWith("confirmRole_")) {
-  const roleId = customId.split("_")[1];
-
-  const text = message.content
-    .split("--------------------")[0]
-    .replace(/📢 \*\*معاينة لرتبة <@&\d+>\*\*/, "");
-
-  const role = guild.roles.cache.get(roleId);
-
-  role.members.forEach(async (m) => {
-    if (m.user.bot) return;
-
-    try {
-      await m.send(text);
-    } catch {}
-  });
-
-  return interaction.update({
-    content: "✅ تم إرسال الكاست للرتبة بالخاص.",
-    embeds: [],
-    components: [],
-  });
-}
-
-    // ===============================
-    //   كاست نصي للكل
-    // ===============================
-   if (customId === "confirmAll") {
-  const text = message.content
-    .split("--------------------")[0]
-    .replace("📢 **معاينة للكل**", "");
-
-  const members = await guild.members.fetch();
-
-  members.forEach(async (m) => {
-    if (m.user.bot) return;
-
-    try {
-      await m.send(text);
-    } catch {}
-  });
-
-  return interaction.update({
-    content: "✅ تم إرسال الكاست للكل بالخاص.",
-    embeds: [],
-    components: [],
-  });
-)
+    return message.reply({ content: preview, components: [row] });
+  }
+});
 
 // =====================================================
 // ====================== دالة اللوق =====================
@@ -380,7 +354,7 @@ async function sendLog(guild, embed) {
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
   const guild = newMember.guild;
 
-  // ---------------------- Customer ----------------------
+  // Customer
   if (
     !oldMember.roles.cache.has(CUSTOMER_ROLE) &&
     newMember.roles.cache.has(CUSTOMER_ROLE)
@@ -388,8 +362,8 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
     try {
       await newMember.send(
         "⭐ تهانينا!\n" +
-        "لقد حصلت على رتبة **Customer**\n" +
-        "• Sword System"
+          "لقد حصلت على رتبة **Customer**\n" +
+          "• Sword System"
       );
     } catch {}
 
@@ -402,7 +376,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
     await sendLog(guild, emb);
   }
 
-  // ------------------- Customer VIP ---------------------
+  // Customer VIP
   if (
     !oldMember.roles.cache.has(CUSTOMER_VIP_ROLE) &&
     newMember.roles.cache.has(CUSTOMER_VIP_ROLE)
@@ -410,8 +384,8 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
     try {
       await newMember.send(
         "🌟 تهانينا!\n" +
-        "لقد حصلت على رتبة **Customer VIP**\n" +
-        "• Sword System"
+          "لقد حصلت على رتبة **Customer VIP**\n" +
+          "• Sword System"
       );
     } catch {}
 
@@ -426,19 +400,16 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 });
 
 // =====================================================
-// =================== أزرار الفواتير ====================
+// =================== أزرار الفواتير + الكاست =========
 // =====================================================
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
 
   const { customId, guild, user, message } = interaction;
-
   const member = guild.members.cache.get(user.id);
 
-  // =====================================================
   // ===================== أزرار الكاست ===================
-  // =====================================================
 
   if (customId === "cancelCast") {
     return interaction.update({
@@ -448,52 +419,68 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 
-  // ===================== كاست للكل =====================
-
+  // كاست نصي للكل (DM)
   if (customId === "confirmAll") {
     const text = message.content
       .split("--------------------")[0]
-      .replace("📢 **معاينة للكل**", "");
+      .replace("📢 **معاينة للكل**", "")
+      .trim();
 
-    await message.channel.send({
-      content: `@everyone\n${text}`,
+    const members = await guild.members.fetch();
+
+    members.forEach(async (m) => {
+      if (m.user.bot) return;
+      try {
+        await m.send(text);
+      } catch {}
     });
 
     return interaction.update({
-      content: "✅ تم إرسال الكاست.",
+      content: "✅ تم إرسال الكاست للكل بالخاص.",
       embeds: [],
       components: [],
     });
   }
 
-  // ===================== كاست رتبة =====================
-
+  // كاست نصي لرتبة (DM)
   if (customId.startsWith("confirmRole_")) {
     const roleId = customId.split("_")[1];
 
     const text = message.content
       .split("--------------------")[0]
-      .replace(/📢 \*\*معاينة لرتبة <@&\d+>\*\*/, "");
+      .replace(/📢 \*\*معاينة لرتبة <@&\d+>\*\*/, "")
+      .trim();
 
-    await message.channel.send({
-      content: `<@&${roleId}>\n${text}`,
+    const role = guild.roles.cache.get(roleId);
+    if (!role)
+      return interaction.update({
+        content: "❌ لم يتم العثور على الرتبة.",
+        embeds: [],
+        components: [],
+      });
+
+    role.members.forEach(async (m) => {
+      if (m.user.bot) return;
+      try {
+        await m.send(text);
+      } catch {}
     });
 
     return interaction.update({
-      content: "✅ تم إرسال الكاست للرتبة.",
+      content: "✅ تم إرسال الكاست للرتبة بالخاص.",
       embeds: [],
       components: [],
     });
   }
 
-  // ===================== كاست شخص =====================
-
+  // كاست نصي لشخص (DM)
   if (customId.startsWith("confirmUser_")) {
     const userId = customId.split("_")[1];
 
     const text = message.content
       .split("--------------------")[0]
-      .replace(/📢 \*\*معاينة الكاست للشخص <@\d+>\*\*/, "");
+      .replace(/📢 \*\*معاينة الكاست للشخص <@\d+>\*\*/, "")
+      .trim();
 
     const target = await guild.members.fetch(userId).catch(() => null);
 
@@ -507,7 +494,7 @@ client.on("interactionCreate", async (interaction) => {
       await target.send(text);
 
       return interaction.update({
-        content: "✅ تم إرسال الكاست للشخص.",
+        content: "✅ تم إرسال الكاست للشخص بالخاص.",
         embeds: [],
         components: [],
       });
@@ -519,8 +506,7 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
-  // ===================== إيمبد للكل =====================
-
+  // إيمبد للكل (DM)
   if (customId.startsWith("confirmEmbedAll_")) {
     const data = customId.replace("confirmEmbedAll_", "");
     const parts = data.split("_");
@@ -533,20 +519,23 @@ client.on("interactionCreate", async (interaction) => {
       .setDescription(desc)
       .setColor("Gold");
 
-    await message.channel.send({
-      content: "@everyone",
-      embeds: [emb],
+    const members = await guild.members.fetch();
+
+    members.forEach(async (m) => {
+      if (m.user.bot) return;
+      try {
+        await m.send({ embeds: [emb] });
+      } catch {}
     });
 
     return interaction.update({
-      content: "✅ تم إرسال الإيمبد للكل.",
+      content: "✅ تم إرسال الإيمبد للكل بالخاص.",
       embeds: [],
       components: [],
     });
   }
 
-  // ===================== إيمبد رتبة =====================
-
+  // إيمبد لرتبة (DM)
   if (customId.startsWith("confirmEmbedRole_")) {
     const data = customId.replace("confirmEmbedRole_", "");
     const parts = data.split("_");
@@ -560,20 +549,29 @@ client.on("interactionCreate", async (interaction) => {
       .setDescription(desc)
       .setColor("Gold");
 
-    await message.channel.send({
-      content: `<@&${roleId}>`,
-      embeds: [emb],
+    const role = guild.roles.cache.get(roleId);
+    if (!role)
+      return interaction.update({
+        content: "❌ لم يتم العثور على الرتبة.",
+        embeds: [],
+        components: [],
+      });
+
+    role.members.forEach(async (m) => {
+      if (m.user.bot) return;
+      try {
+        await m.send({ embeds: [emb] });
+      } catch {}
     });
 
     return interaction.update({
-      content: "✅ تم إرسال الإيمبد للرتبة.",
+      content: "✅ تم إرسال الإيمبد للرتبة بالخاص.",
       embeds: [],
       components: [],
     });
   }
 
-  // ===================== إيمبد شخص =====================
-
+  // إيمبد لشخص (DM)
   if (customId.startsWith("confirmEmbedUser_")) {
     const data = customId.replace("confirmEmbedUser_", "");
     const parts = data.split("_");
@@ -599,7 +597,7 @@ client.on("interactionCreate", async (interaction) => {
       await target.send({ embeds: [emb] });
 
       return interaction.update({
-        content: "✅ تم إرسال الإيمبد للشخص.",
+        content: "✅ تم إرسال الإيمبد للشخص بالخاص.",
         embeds: [],
         components: [],
       });
@@ -626,11 +624,10 @@ client.on("interactionCreate", async (interaction) => {
 
   const invoiceId = emb.title.match(/#(\d+)/)?.[1] || "???";
 
-  const clientId = emb.fields[0].value.match(/\`(\d+)\`/)?.[1];
+  const clientId = emb.fields[0].value.match(/`(\d+)`/)?.[1];
   const targetUser = await guild.members.fetch(clientId).catch(() => null);
 
-  // ======================= تم الدفع =====================
-
+  // تم الدفع
   if (customId.startsWith("invoice_paid_")) {
     const newEmbed = EmbedBuilder.from(emb)
       .setColor(0x57f287)
@@ -663,8 +660,7 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 
-  // ===================== إلغاء الفاتورة =================
-
+  // إلغاء الفاتورة
   if (customId.startsWith("invoice_cancel_")) {
     const newEmbed = EmbedBuilder.from(emb)
       .setColor(0xed4245)
@@ -697,6 +693,7 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 });
+
 /* =====================================================
    ===================== تسجيل الدخول ====================
    ===================================================== */
@@ -707,6 +704,5 @@ client.login(process.env.TOKEN);
    ====================== النهاية ========================
    ===================================================== */
 
-// تم بناء هذا النظام بالكامل بواسطة:
 // Sword System — Discord Bot
 // جميع الحقوق محفوظة لدى Esro Store ❤️
